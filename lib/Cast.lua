@@ -1,7 +1,6 @@
 local mq = require("mq")
-local Logger = require("PortBot.Logger")
-local Spell = require("PortBot.Spell")
-local Report = require("PortBot.Report")
+local Logger = require("PortBot.lib.Logger")
+local Report = require("PortBot.lib.Report")
 
 ---@alias ProgressHandler fun(remainingSeconds: integer): any
 ---@class Cast

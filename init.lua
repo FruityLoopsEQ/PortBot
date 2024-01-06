@@ -1,8 +1,8 @@
 local mq = require("mq")
-local Logger = require("PortBot.Logger")
-local PortHandler = require("PortBot.PortHandler")
-local Report = require("PortBot.Report")
-local Cast = require("PortBot.Cast")
+local Logger = require("PortBot.lib.Logger")
+local PortHandler = require("PortBot.lib.PortHandler")
+local Report = require("PortBot.lib.Report")
+local Cast = require("PortBot.lib.Cast")
 
 Logger.prefix = "PortBot"
 Logger.loglevel = "info"

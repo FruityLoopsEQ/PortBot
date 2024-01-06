@@ -2,7 +2,7 @@ local mq = require("mq")
 
 Logger = {}
 Logger.loglevel = 'info'
-Logger.prefix = 'PREFIX'
+Logger.prefix = ''
 
 local loglevels = {
     ['debug'] = { level = 1, abbreviation = 'DEBUG', },

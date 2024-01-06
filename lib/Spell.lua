@@ -1,5 +1,5 @@
 local mq = require("mq")
-local Logger = require("PortBot.Logger")
+local Logger = require("PortBot.lib.Logger")
 
 ---@class Spell
 ---@field ID integer

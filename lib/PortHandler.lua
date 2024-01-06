@@ -1,6 +1,6 @@
 local mq = require("mq")
-local Logger = require("PortBot.Logger")
-local Spell = require("PortBot.Spell")
+local Logger = require("PortBot.lib.Logger")
+local Spell = require("PortBot.lib.Spell")
 
 ---@class PortHandler
 ---@field spell Spell
