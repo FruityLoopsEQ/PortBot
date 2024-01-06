@@ -12,6 +12,8 @@ Report.addChannel("/bc")
 
 BLOCK_PORTS=false
 
+VERSION="0.0.1"
+
 local function in_game() return mq.TLO.MacroQuest.GameState() == "INGAME" end
 
 local currentCast = nil
@@ -125,7 +127,7 @@ local function printPortHandlers(handlers)
 end
 
 local function start()
-    Logger.Info("Starting PortBot")
+    Logger.Info("Starting Version: %s", VERSION)
 
     local handlers = registerSpellHandlers(spells)
 
