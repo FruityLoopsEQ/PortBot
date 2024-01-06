@@ -14,8 +14,6 @@ BLOCK_PORTS=false
 
 VERSION="0.0.1"
 
-local function in_game() return mq.TLO.MacroQuest.GameState() == "INGAME" end
-
 local currentCast = nil
 local function stopCasting()
     if currentCast ~= nil then
@@ -113,8 +111,6 @@ local spells = {
     ["Circle of Natimbi"] = { "natimbi", "nat" },
 }
 
--- Ramzee creates a mystic portal.
--- Jibb discorporates in a portal of wind.
 --- @param handlers PortHandler[]
 local function printPortHandlers(handlers)
     mq.cmd("/g Port destinations")
@@ -125,6 +121,8 @@ local function printPortHandlers(handlers)
         mq.cmdf("/g %s (%s)", handler:destination(), matches)
     end
 end
+
+local function inGame() return mq.TLO.MacroQuest.GameState() == "INGAME" end
 
 local function start()
     Logger.Info("Starting Version: %s", VERSION)
@@ -144,10 +142,8 @@ local function start()
     mq.event("stop", "#1# tells #*#, 'stop'", stopCasting)
     mq.event("cancel", "#1# tells #*#, 'cancel'", stopCasting)
 
-    local last_time = os.time()
-
     while true do
-        if in_game() and os.difftime(os.time(), last_time) >= 1 then
+        if inGame() then
             mq.doevents()
         end
     end
