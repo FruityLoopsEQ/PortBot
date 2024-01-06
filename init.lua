@@ -12,33 +12,33 @@ Report.addChannel("/bc")
 
 BLOCK_PORTS=false
 
-local function in_game() return mq.TLO.MacroQuest.GameState() == 'INGAME' end
+local function in_game() return mq.TLO.MacroQuest.GameState() == "INGAME" end
 
-local cast = nil
+local currentCast = nil
 local function stopCasting()
-    if cast ~= nil then
-        cast:stop()
+    if currentCast ~= nil then
+        currentCast:stop()
     end
 
-    cast = nil
+    currentCast = nil
 end
 
 --- @param spell Spell
 local function castSpell(spell)
     stopCasting()
 
-    cast = Cast.build(spell)
+    currentCast = Cast.build(spell)
 
     if BLOCK_PORTS then
         spell:block()
     end
 
-    cast:start()
+    currentCast:start()
 
     if BLOCK_PORTS then
         spell:unblock()
     end
-    cast = nil
+    currentCast = nil
 end
 
 --- @param portSpells table<string, string[]>
@@ -67,8 +67,7 @@ local function registerSpellHandlers(portSpells)
     return handlers
 end
 
-
-local function handleGroupInvite(line, inviterName)
+local function handleGroupInvite(_, inviterName)
     Logger.Info("Group invite from %s", inviterName)
 
     mq.cmdf("/target %s", inviterName)
@@ -132,7 +131,7 @@ local function start()
 
     mq.event("groupInvite", "#1# invites you to join a group.", handleGroupInvite)
 
-    local function handlePortHelp(line, senderName)
+    local function handlePortHelp(_, senderName)
         Logger.Debug("Help requested by %s", senderName)
 
         printPortHandlers(handlers)
