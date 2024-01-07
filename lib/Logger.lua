@@ -32,6 +32,7 @@ local function GetCallerString()
 end
 
 local function Output(paramLogLevel, message, ...)
+    message = tostring(message)
     local formattedMessage = message:format(...)
 
     if loglevels[Logger.loglevel:lower()].level <= loglevels[paramLogLevel].level then
