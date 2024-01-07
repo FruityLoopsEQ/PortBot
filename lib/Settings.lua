@@ -1,8 +1,5 @@
-local mq = require("mq")
 local Logger = require("PortBot.lib.Logger")
 local IniFile = require("PortBot.lib.IniFile")
-
-CONFIG_FILE_PATH = mq.configDir .. "/PortBot.ini"
 
 local Defaults = {
  blockTeleport = true,
@@ -12,15 +9,9 @@ local Defaults = {
 ---@class Settings
 ---@field blockTeleport boolean
 ---@field acceptGroupInvite boolean
+---@field configFilePath string
 Settings = {
-  __tostring = function(settings)
-    local blockTeleport = settings.blockTeleport
-    local acceptGroupInvite = settings.acceptGroupInvite
-
-    local template = "Settings: blockTeleport=%s, acceptGroupInvite=%s"
-
-    return string.format(template, blockTeleport, acceptGroupInvite)
-  end
+  configFilePath = ""
 }
 Settings.__index = Settings
 
@@ -39,11 +30,11 @@ end
 
 --- @return Settings
 function Settings.load()
-  Logger.Info("Getting settings")
+  Logger.Info("Loading settings")
 
   local settings = nil
 
-  local section = IniFile.getSection(CONFIG_FILE_PATH, "Settings")
+  local section = IniFile.getSection(Settings.configFilePath, "Settings")
 
   if not section then
     settings = Settings.new(Defaults.blockTeleport, Defaults.acceptGroupInvite)
@@ -64,16 +55,17 @@ function Settings.load()
 
   Settings.write(settings)
 
+  Logger.Debug("Settings loaded")
   return settings
 end
 
 
 ---@param settings Settings
 function Settings.write(settings)
-  Logger.Debug("Writing %s", settings)
+  Logger.Debug("Writing settings")
 
-  IniFile.write(CONFIG_FILE_PATH, "Settings", "BlockTeleport", settings.blockTeleport)
-  IniFile.write(CONFIG_FILE_PATH, "Settings", "AcceptGroupInvite", settings.acceptGroupInvite)
+  IniFile.write(Settings.configFilePath, "Settings", "BlockTeleport", settings.blockTeleport)
+  IniFile.write(Settings.configFilePath, "Settings", "AcceptGroupInvite", settings.acceptGroupInvite)
 end
 
 

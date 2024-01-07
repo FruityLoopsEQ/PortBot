@@ -61,13 +61,13 @@ function IniFile:section(name)
 
   local keyCount = mqSection.Key.Count()
 
-  Logger.Debug("Reading Section - name=%s", name)
+  Logger.Debug("Reading Section - [%s]", name)
 
   for i=1,keyCount do
     local key = mqSection.Key.KeyAtIndex(i)()
     local value = mqSection.Key(key).Value()
 
-    Logger.Debug("%s - %s=%s", name, key, value)
+    Logger.Debug("%s=%s", key, value)
 
     if value == "true" then
       value = true
