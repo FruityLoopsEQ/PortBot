@@ -1,150 +1,93 @@
 local mq = require("mq")
 local Logger = require("PortBot.lib.Logger")
-local PortHandler = require("PortBot.lib.PortHandler")
 local Report = require("PortBot.lib.Report")
-local Cast = require("PortBot.lib.Cast")
+local Teleport = require("PortBot.lib.Teleport")
+local Settings = require("PortBot.lib.Settings")
+local Destinations = require("PortBot.lib.Destinations")
 
 Logger.prefix = "PortBot"
 Logger.loglevel = "info"
 
+Settings.configFilePath = mq.configDir .. "/PortBot.ini"
+Destinations.configFilePath = mq.configDir .. "/PortBot.ini"
+
 Report.addChannel("/g")
 Report.addChannel("/bc")
 
-BLOCK_PORTS=false
-
-VERSION="0.0.1"
-
-local currentCast = nil
-local function stopCasting()
-    if currentCast ~= nil then
-        currentCast:stop()
-    end
-
-    currentCast = nil
-end
-
---- @param spell Spell
-local function castSpell(spell)
-    stopCasting()
-
-    currentCast = Cast.build(spell)
-
-    if BLOCK_PORTS then
-        spell:block()
-    end
-
-    currentCast:start()
-
-    if BLOCK_PORTS then
-        spell:unblock()
-    end
-    currentCast = nil
-end
-
---- @param portSpells table<string, string[]>
---- @return PortHandler[]
-local function registerSpellHandlers(portSpells)
-    Logger.Debug("Registering handlers")
-    local handlers = {}
-
-    for spellName, aliases in pairs(portSpells) do
-        local handler = PortHandler:build(spellName)
-
-        Logger.Debug("Register %s", spellName)
-
-        for _,alias in ipairs(aliases) do
-            Logger.Debug("  -> %s", alias)
-            handler:register(alias, castSpell)
-        end
-
-        table.insert(handlers, handler)
-    end
-
-    local sort = function(a, b)
-        return a:destination():lower() < b:destination():lower()
-    end
-    table.sort(handlers, sort)
-    return handlers
-end
-
-local function handleGroupInvite(_, inviterName)
-    Logger.Info("Group invite from %s", inviterName)
-
-    mq.cmdf("/target %s", inviterName)
-    mq.delay("250ms")
-    mq.cmd("/invite")
-end
-
-local spells = {
-    -- Antonica
-    ["Circle of Lavastorm"] = { "lavastorm" },
-    ["Circle of Feerrott"] = { "feerrott", "fear" },
-    ["Circle of Misty"] = { "misty" },
-    ["Circle of Ro"] = { "sro", "ro" },
-    ["Circle of Commons"] = { "commons", "wc" },
-    ["Circle of Surefall Glade"] = { "surefall", "sfg" },
-    ["Circle of Karana"] = { "karana", "wk" },
-    --  Faydwer
-    ["Circle of Steamfont"] = { "steamfont", "sfm" },
-    ["Circle of Butcher"] = { "butcher", "butcherblock", "bb" },
-    -- Odus
-    ["Circle of Stonebrunt"] = { "stonebrunt" },
-    ["Circle of Toxxulia"] = { "tox" },
-    -- Kunark
-    ["Wind of the North"] = { "skyfire" },
-    ["Wind of the South"] = { "emerald", "ej" },
-    ["Circle of the Combines"] = { "dreadlands", "dl" },
-    -- Velious
-    ["Circle of Cobalt Scar"] = { "cobalt scar", "cs" },
-    ["Circle of Wakening Lands"] = { "wakening lands", "wakening", "wl" },
-    ["Circle of Great Divide"] = { "great divide", "divide", "gd" },
-    ["Circle of Iceclad"] = { "iceclad" },
-    -- Luclin
-    ["Circle of the Nexus"] = { "nexus" },
-    ["Circle of Dawnshroud"] = { "dawnshroud" },
-    ["Circle of Twilight"] = { "twilight" },
-    ["Circle of Grimling"] = { "grimling" },
-    -- Planes of Power
-    ["Circle of Knowledge"] = { "knowledge", "pok" },
-    -- Taelosia
-    ["Circle of Barindu"] = { "barindu", "bar" },
-    ["Circle of Natimbi"] = { "natimbi", "nat" },
-}
-
---- @param handlers PortHandler[]
-local function printPortHandlers(handlers)
-    mq.cmd("/g Port destinations")
-    mq.cmd("/g - - -")
-
-    for _, handler in ipairs(handlers) do
-        local matches = table.concat(handler.matches, ", ")
-        mq.cmdf("/g %s (%s)", handler:destination(), matches)
-    end
-end
+VERSION="0.1.0"
 
 local function inGame() return mq.TLO.MacroQuest.GameState() == "INGAME" end
 
 local function start()
     Logger.Info("Starting Version: %s", VERSION)
 
-    local handlers = registerSpellHandlers(spells)
+    local settings = Settings.load()
+    local destinations = Destinations.load()
 
-    mq.event("groupInvite", "#1# invites you to join a group.", handleGroupInvite)
+    Logger.Info("Block Teleport=%s", settings.blockTeleport)
 
-    local function handlePortHelp(_, senderName)
-        Logger.Debug("Help requested by %s", senderName)
+    local currentTeleport = nil
 
-        printPortHandlers(handlers)
+    local function stopTeleport()
+        Logger.Debug("Received stop teleport")
+
+        if currentTeleport then
+            currentTeleport:stop()
+        end
+
+        currentTeleport = nil
     end
 
-    mq.event("port", "#1# tells #*#, 'port'", handlePortHelp)
-    mq.event("help", "#1# tells #*#, 'help'", handlePortHelp)
-    mq.event("stop", "#1# tells #*#, 'stop'", stopCasting)
-    mq.event("cancel", "#1# tells #*#, 'cancel'", stopCasting)
+    destinations:register(function(destination)
+        stopTeleport()
+
+        Report("Destination set to %s", destination.name)
+        Report("Say 'cancel' in group tell to cancel portal")
+
+        currentTeleport = Teleport.new(destination, settings.blockTeleport)
+
+        currentTeleport:cast()
+
+        currentTeleport = nil
+    end)
+
+    mq.event("stop", "#1# tells #*#, 'stop'", stopTeleport)
+    mq.event("cancel", "#1# tells #*#, 'cancel'", stopTeleport)
+
+    mq.event("groupInvite", "#1# invites you to join a group.", function(_, inviterName)
+        if settings.acceptGroupInvite then
+            Logger.Info("Group invite from %s", inviterName)
+
+            mq.cmdf("/target %s", inviterName)
+            mq.delay("1s", function()
+              return mq.TLO.Target.CleanName() == inviterName
+            end)
+
+            mq.cmd("/invite")
+        end
+    end)
+
+    local function printHelp()
+        mq.cmd("/g Port destinations")
+        mq.cmd("/g - - -")
+
+        for _, destination in ipairs(destinations.members) do
+            if destination:anyAliases() then
+                local aliases = table.concat(destination.aliases, ", ")
+                mq.cmdf("/g %s (%s)", destination.name, aliases)
+            else
+                mq.cmdf("/g %s", destination.name)
+            end
+        end
+    end
+
+    mq.event("port", "#1# tells #*#, 'port'", printHelp)
+    mq.event("help", "#1# tells #*#, 'help'", printHelp)
 
     while true do
         if inGame() then
             mq.doevents()
+            mq.delay("500ms")
         end
     end
 end
