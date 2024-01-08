@@ -4,20 +4,17 @@ local Logger = require("PortBot.lib.Logger")
 ---@class Spell
 ---@field ID integer
 ---@field name string
----@field description string
 Spell = {}
 Spell.__index = Spell
 
 ---@param ID integer
 ---@param name string
----@param description string
-function Spell:new(ID, name, description)
+function Spell:new(ID, name)
     local spell = {}
     setmetatable(spell, Spell)
 
     spell.ID = ID
     spell.name = name
-    spell.description = description
 
     return spell
 end
@@ -27,21 +24,10 @@ function Spell:build(spellName)
 
     local ID = mqSpell.ID()
     local name = mqSpell.Name()
-    local description = mqSpell.Description()
 
-    local spell = Spell:new(ID, name, description)
+    local spell = Spell:new(ID, name)
 
     return spell
-end
-
-function Spell:destination()
-    local target = self.description:match("Opens a mystical portal that transports your group to (.*)")
-    target = target or self.description:match("Opens a mystic portal that teleports your group to (.*)")
-
-    local zone = target:match("the (.*).")
-    zone = zone or target:match("(.*).")
-
-    return zone
 end
 
 function Spell:cast()
