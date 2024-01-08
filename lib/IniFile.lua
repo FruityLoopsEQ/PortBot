@@ -1,8 +1,9 @@
 local mq = require("mq")
+local Logger = require("PortBot.lib.Logger")
 
 ---@class IniFile
 ---@field mqIniFile userdata
-IniFile = {}
+local IniFile = {}
 IniFile.__index = IniFile
 
 ---@param mqIniFile userdata

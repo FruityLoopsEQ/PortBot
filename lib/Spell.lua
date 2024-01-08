@@ -4,7 +4,7 @@ local Logger = require("PortBot.lib.Logger")
 ---@class Spell
 ---@field id integer
 ---@field name string
-Spell = {}
+local Spell = {}
 Spell.__index = Spell
 
 ---@param id integer

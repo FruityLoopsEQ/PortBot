@@ -10,7 +10,7 @@ local Defaults = {
 ---@field blockTeleport boolean
 ---@field acceptGroupInvite boolean
 ---@field configFilePath string
-Settings = {
+local Settings = {
   configFilePath = ""
 }
 Settings.__index = Settings

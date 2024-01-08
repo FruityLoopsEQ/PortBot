@@ -1,6 +1,6 @@
 local mq = require("mq")
 
-Report = {}
+local Report = {}
 
 Report.channels = {}
 Report.addChannel = function(channel)

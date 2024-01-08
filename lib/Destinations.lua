@@ -21,7 +21,7 @@ end
 ---@field name string
 ---@field spell Spell
 ---@field aliases string[]
-Destination = {}
+local Destination = {}
 Destination.__index = Destination
 
 ---@param name string
@@ -85,7 +85,7 @@ end
 ---@class Destinations
 ---@field configFilePath string
 ---@field members Destination[]
-Destinations = {
+local Destinations = {
   configFilePath = ""
 }
 Destinations.__index = Destinations

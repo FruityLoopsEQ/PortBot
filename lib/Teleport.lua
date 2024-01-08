@@ -7,7 +7,7 @@ local Report = require("PortBot.lib.Report")
 ---@field blockSpell boolean
 ---@field casting boolean
 ---@field cancel boolean
-Teleport = {}
+local Teleport = {}
 Teleport.__index = Teleport
 
 ---@param destination Destination
