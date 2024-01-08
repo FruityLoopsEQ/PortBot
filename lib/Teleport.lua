@@ -71,6 +71,11 @@ function Teleport:cast()
         return
     end
 
+
+    if self.blockSpell then
+        spell:block()
+    end
+
     Report("Casting %s", spell.name)
 
     spell:cast()
@@ -79,11 +84,15 @@ function Teleport:cast()
     while Teleport.isCasting() and not self.cancel do
         local secondsRemaining = Teleport.timeRemainingSeconds()
 
-        if secondsRemaining < 6 and secondsRemaining > 0 then
-            Report("%s", secondsRemaining)
+        if secondsRemaining < 7 and secondsRemaining > 0 then
+            Report("%.0f", secondsRemaining)
         end
 
         mq.delay("1s")
+    end
+
+    if self.blockSpell then
+        spell:unblock()
     end
 end
 

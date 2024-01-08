@@ -84,6 +84,19 @@ local function start()
     mq.event("port", "#1# tells #*#, 'port'", printHelp)
     mq.event("help", "#1# tells #*#, 'help'", printHelp)
 
+    mq.bind("/portbot", function(cmd, status)
+        if cmd == "block" and status then
+            if status == "on" or status == "true" or status == "1" then
+                settings.blockTeleport = true
+            else
+                settings.blockTeleport = false
+            end
+
+            Logger.Info("Block is set to %s", settings.blockTeleport)
+            Settings.write(settings)
+        end
+    end)
+
     while true do
         if inGame() then
             mq.doevents()

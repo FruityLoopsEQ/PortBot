@@ -22,6 +22,8 @@ Configuration files found under the MQ config directory
 
 #### PortBot.ini
 
+Destinations are in the format `<Name>=<spell name>|<aliases>`. e.g. `Some Zone=Some Spell|some-alias,some-other-alias`
+
 ``` ini
 [Settings]
 BlockTeleport=true
@@ -72,6 +74,9 @@ Natimbi=Circle of Natimbi|nat
 
 ; Evac
 Succor=Succor|evac
-Exodus=Exodus|exodus
+Exodus=Exodus
 ```
 
+### Commands
+
+- `/portbot block <on|off>` - Block or unblock teleports
