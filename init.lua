@@ -24,6 +24,8 @@ local function start()
     local settings = Settings.load()
     local destinations = Destinations.load()
 
+    Logger.Info("Block Teleport=%s", settings.blockTeleport)
+
     local currentTeleport = nil
 
     local function stopTeleport()

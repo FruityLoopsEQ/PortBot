@@ -58,7 +58,7 @@ function Teleport:cast()
 
     local spell = self.destination.spell
 
-    if not spell.isSkill and not spell:isReady() and not self.cancel then
+    if not spell:isAA() and not spell:isReady() and not self.cancel then
         Report("Loading %s", spell.name)
         spell:memorize()
     end
