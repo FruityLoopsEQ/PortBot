@@ -51,8 +51,8 @@ local function start()
         currentTeleport = nil
     end)
 
-    mq.event("stop", "#1# tells #*#, 'stop'", stopTeleport)
-    mq.event("cancel", "#1# tells #*#, 'cancel'", stopTeleport)
+    mq.event("stop", "#1# tells the group, 'stop'", stopTeleport)
+    mq.event("cancel", "#1# tells the group, 'cancel'", stopTeleport)
 
     mq.event("groupInvite", "#1# invites you to join a group.", function(_, inviterName)
         if settings.acceptGroupInvite then
@@ -81,8 +81,8 @@ local function start()
         end
     end
 
-    mq.event("port", "#1# tells #*#, 'port'", printHelp)
-    mq.event("help", "#1# tells #*#, 'help'", printHelp)
+    mq.event("port", "#1# tells the group, 'port'", printHelp)
+    mq.event("help", "#1# tells the group, 'help'", printHelp)
 
     mq.bind("/portbot", function(cmd, status)
         if cmd == "block" and status then

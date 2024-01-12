@@ -44,7 +44,7 @@ end
 ---@param callback fun(destination: Destination): any
 function Destination:register(callback)
   local eventTemplate = "destination-%s"
-  local matchTemplate = "#1# tells #*#, '%s'"
+  local matchTemplate = "#1# tells the group, '%s'"
 
   Logger.Debug("Registering destination(%s)", self.name)
 
