@@ -19,6 +19,7 @@ function Spell.new(id, name)
     return spell
 end
 
+---@param spellName string
 function Spell.build(spellName)
     local mqSpell = mq.TLO.Spell(spellName)
 
@@ -50,10 +51,21 @@ function Spell:memorize()
     mq.cmdf('/memorize "%s"', self.name)
 end
 
-function Spell:isReady()
-    return mq.parse(string.format("${Cast.Ready[%s]}", self.name)) == "TRUE"
+---@return boolean
+function Spell:isLearned()
+    local spell = mq.TLO.Me.Spell(self.name)
+
+    return spell() ~= nil
 end
 
+---@return boolean
+function Spell:isReady()
+  local castStatus = mq.parse(string.format("${Cast.Ready[%s]}", self.name))
+
+  return castStatus == "TRUE"
+end
+
+---@return boolean
 function Spell:isAA()
     local mqAA = mq.TLO.AltAbility(self.name)
 

@@ -1,44 +1,41 @@
 local mq = require("mq")
 local Logger = require("PortBot.lib.Logger")
-local IniFile = require("PortBot.lib.IniFile")
 local Spell = require("PortBot.lib.Spell")
-
-local function splitString(inputstr, sep)
-   if sep == nil then
-      sep = "%s"
-   end
-
-   local t={}
-
-   for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-      table.insert(t, str)
-   end
-
-   return t
-end
 
 ---@class Destination
 ---@field name string
----@field spell Spell
----@field aliases string[]
+---@field spells Spell[]
+---@field aliases string[] | nil
 local Destination = {}
 Destination.__index = Destination
 
 ---@param name string
----@param spell Spell
+---@param spells Spell[]
 ---@param aliases string[] | nil
 ---@return Destination
-function Destination.new(name, spell, aliases)
-  aliases = aliases or {}
-
+function Destination.new(name, spells, aliases)
   local destination = {}
   setmetatable(destination, Destination)
 
   destination.name = name
-  destination.spell = spell
+  destination.spells = spells
   destination.aliases = aliases
 
   return destination
+end
+
+---@return Spell | nil
+function Destination:getSpell()
+  for _, spell in ipairs(self.spells) do
+    if spell:isLearned() then
+      return spell
+    end
+  end
+end
+
+---@return boolean
+function Destination:hasSpell()
+  return self:getSpell() ~= nil
 end
 
 ---@param callback fun(destination: Destination): any
@@ -55,77 +52,77 @@ function Destination:register(callback)
 
   mq.event(eventTemplate:format(self.name), matchTemplate:format(self.name), onEvent)
 
-  for _, alias in ipairs(self.aliases) do
+  local aliases = self.aliases or {}
+  for _, alias in ipairs(aliases) do
     mq.event(eventTemplate:format(alias), matchTemplate:format(alias), onEvent)
   end
 end
 
-function Destination:anyAliases()
-  return next(self.aliases)
-end
+----@type Destination[]
+local Destinations = {}
 
 ---@param name string
----@param value string
----@return Destination
-function Destination.parse(name, value)
-    local valueParts = splitString(value, "|")
+---@param spellNames string[]
+---@param aliases string[] | nil
+local function addDestination(name, spellNames, aliases)
+  local spells = {}
 
-    local spellName = valueParts[1]
-    local aliasParts = valueParts[2]
-    local aliases = {}
-
-    if aliasParts then
-      aliases = splitString(aliasParts, ",")
-    end
-
+  for _, spellName in ipairs(spellNames) do
     local spell = Spell.build(spellName)
-    return Destination.new(name, spell, aliases)
-end
-
----@class Destinations
----@field configFilePath string
----@field members Destination[]
-local Destinations = {
-  configFilePath = ""
-}
-Destinations.__index = Destinations
-
----@return Destinations
-function Destinations.new()
-  local destinations = {}
-  setmetatable(destinations, Destinations)
-
-  destinations.members = {}
-
-  return destinations
-end
-
----@return Destinations
-function Destinations.load()
-  local configFilePath = Destinations.configFilePath
-
-  Logger.Info("Loading destinations")
-  local destinations = Destinations.new()
-
-  local section = IniFile.getSection(configFilePath, "Destinations")
-
-  assert(section, string.format("Couldn't find [Destinations] section in %s", configFilePath))
-
-  for name, value in pairs(section) do
-    local destination = Destination.parse(name, value)
-
-    table.insert(destinations.members, destination)
+    table.insert(spells, spell)
   end
 
-  Logger.Debug("Destinations loaded")
-  return destinations
+  local destination = Destination.new(name, spells, aliases)
+
+  table.insert(Destinations, destination)
+
+  return destination
 end
 
----@param callback fun(destination: Destination): any
-function Destinations:register(callback)
-  for _, destination in ipairs(self.members) do
-    destination:register(callback)
-  end
-end
+-- Antonica
+addDestination("Lavastorm", { "Circle of Lavastorm" })
+addDestination("Feerrott", { "Circle of Feerrott" }, { "fear" })
+addDestination("Misty", { "Circle of Misty" })
+addDestination("South Ro", { "Circle of Ro" }, { "sro", "ro" })
+addDestination("West Commonlands", { "Circle of Commons" }, { "commons", "wc" })
+addDestination("Surefall Glade", { "Circle of Surefall Glade" }, { "surefall", "sfg" })
+addDestination("North Karana", { "Circle of Karana" }, { "karana", "nk" })
+
+-- Faydwer
+addDestination("Steamfont", { "Circle of Steamfont" })
+addDestination("Butcherblock", { "Circle of Butcher" }, { "butcher", "bb" })
+
+-- Odus
+addDestination("Stonebrunt", { "Circle of Stonebrunt" })
+addDestination("Toxxulia", { "Circle of Toxxulia" }, { "tox" })
+
+-- Kunark
+addDestination("Skyfire", { "Wind of the North" })
+addDestination("Emerald Jungle", { "Wind of the South" }, { "emerald", "ej" })
+addDestination("Dreadlands", { "Circle of the Combines" }, { "dl" })
+
+-- Velious
+addDestination("Cobalt Scar", { "Circle of Cobalt Scar" })
+addDestination("Wakening Lands", { "Circle of Wakening Lands" }, { "wakening" })
+addDestination("Great Divide", { "Circle of Great Divide" }, { "gd" })
+addDestination("Iceclad", { "Circle of Iceclad" })
+
+-- Luclin
+addDestination("Nexus", { "Circle of the Nexus" })
+addDestination("Dawnshroud", { "Circle of Dawnshroud" })
+addDestination("Twilight", { "Circle of Twilight" })
+addDestination("Grimling", { "Circle of Grimling" })
+
+-- Planes of Power
+addDestination("Plane of Knowledge", { "Circle of Knowledge" }, { "knowledge", "pok" })
+
+-- Taelosia (GoD)
+addDestination("Barindu", { "Circle of Barindu" })
+addDestination("Natimbi", { "Circle of Natimbi" })
+
+-- Evac
+addDestination("Evac", { "Lesser Succor", "Succor", "Exodus" })
+
+
 
 return Destinations
