@@ -121,7 +121,7 @@ addDestination("Barindu", { "Circle of Barindu" })
 addDestination("Natimbi", { "Circle of Natimbi" })
 
 -- Evac
-addDestination("Evac", { "Lesser Succor", "Succor", "Exodus" })
+addDestination("Evac", { "Exodus", "Succor", "Lesser Succor" })
 
 
 return Destinations
