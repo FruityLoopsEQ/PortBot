@@ -124,5 +124,4 @@ addDestination("Natimbi", { "Circle of Natimbi" })
 addDestination("Evac", { "Lesser Succor", "Succor", "Exodus" })
 
 
-
 return Destinations
