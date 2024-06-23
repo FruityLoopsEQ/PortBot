@@ -13,7 +13,7 @@ Settings.configFilePath = mq.configDir .. "/PortBot.ini"
 Report.addChannel("/g")
 Report.addChannel("/bc")
 
-VERSION = "1.0.2"
+VERSION = "2.0.0"
 
 local function inGame() return mq.TLO.MacroQuest.GameState() == "INGAME" end
 
