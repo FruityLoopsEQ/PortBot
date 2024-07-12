@@ -58,13 +58,27 @@ function Destination:register(callback)
   end
 end
 
-----@type Destination[]
-local Destinations = {}
+---@class Collection
+---@field members Destination[]
+local Collection = {}
+Collection.__index = Collection
+
+---@param members Destination[] | nil
+---@return Collection
+function Collection.new(members)
+  members = members or {}
+  local destinations = {}
+  setmetatable(destinations, Collection)
+
+  destinations.members = members
+
+  return destinations
+end
 
 ---@param zoneName string
 ---@param spellNames string[]
 ---@param aliases string[] | nil
-local function addDestination(zoneName, spellNames, aliases)
+function Collection:add(zoneName, spellNames, aliases)
   local spells = {}
 
   for _, spellName in ipairs(spellNames) do
@@ -74,54 +88,63 @@ local function addDestination(zoneName, spellNames, aliases)
 
   local destination = Destination.new(zoneName, spells, aliases)
 
-  table.insert(Destinations, destination)
+  table.insert(self.members, destination)
 
   return destination
 end
 
+---@param callback fun(destination: Destination): any
+function Collection:each(callback)
+  for _, destination in ipairs(self.members) do
+    callback(destination)
+  end
+end
+
+local Destinations = Collection.new()
+
 -- Antonica
-addDestination("Lavastorm", { "Circle of Lavastorm" })
-addDestination("Feerrott", { "Circle of Feerrott" }, { "fear" })
-addDestination("Misty", { "Circle of Misty" })
-addDestination("South Ro", { "Circle of Ro" }, { "sro", "ro" })
-addDestination("West Commonlands", { "Circle of Commons" }, { "commons", "wc" })
-addDestination("Surefall Glade", { "Circle of Surefall Glade" }, { "surefall", "sfg" })
-addDestination("North Karana", { "Circle of Karana" }, { "karana", "nk" })
-addDestination("East Karana", { "Succor: East" }, { "east karana", "ek" })
+Destinations:add("Lavastorm", { "Circle of Lavastorm" })
+Destinations:add("Feerrott", { "Circle of Feerrott" }, { "fear" })
+Destinations:add("Misty", { "Circle of Misty" })
+Destinations:add("South Ro", { "Circle of Ro" }, { "sro", "ro" })
+Destinations:add("West Commonlands", { "Circle of Commons" }, { "commons", "wc" })
+Destinations:add("Surefall Glade", { "Circle of Surefall Glade" }, { "surefall", "sfg" })
+Destinations:add("North Karana", { "Circle of Karana" }, { "karana", "nk" })
+Destinations:add("East Karana", { "Succor: East" }, { "east karana", "ek" })
 
 -- Faydwer
-addDestination("Steamfont", { "Circle of Steamfont" })
-addDestination("Butcherblock", { "Circle of Butcher" }, { "butcher", "bb" })
+Destinations:add("Steamfont", { "Circle of Steamfont" })
+Destinations:add("Butcherblock", { "Circle of Butcher" }, { "butcher", "bb" })
 
 -- Odus
-addDestination("Stonebrunt", { "Circle of Stonebrunt" })
-addDestination("Toxxulia", { "Circle of Toxxulia" }, { "tox" })
+Destinations:add("Stonebrunt", { "Circle of Stonebrunt" })
+Destinations:add("Toxxulia", { "Circle of Toxxulia" }, { "tox" })
 
 -- Kunark
-addDestination("Skyfire", { "Wind of the North" })
-addDestination("Emerald Jungle", { "Wind of the South" }, { "emerald", "ej" })
-addDestination("Dreadlands", { "Circle of the Combines" }, { "dl" })
+Destinations:add("Skyfire", { "Wind of the North" })
+Destinations:add("Emerald Jungle", { "Wind of the South" }, { "emerald", "ej" })
+Destinations:add("Dreadlands", { "Circle of the Combines" }, { "dl" })
 
 -- Velious
-addDestination("Cobalt Scar", { "Circle of Cobalt Scar" })
-addDestination("Wakening Lands", { "Circle of Wakening Lands" }, { "wakening" })
-addDestination("Great Divide", { "Circle of Great Divide" }, { "gd" })
-addDestination("Iceclad", { "Circle of Iceclad" })
+Destinations:add("Cobalt Scar", { "Circle of Cobalt Scar" })
+Destinations:add("Wakening Lands", { "Circle of Wakening Lands" }, { "wakening" })
+Destinations:add("Great Divide", { "Circle of Great Divide" }, { "gd" })
+Destinations:add("Iceclad", { "Circle of Iceclad" })
 
 -- Luclin
-addDestination("Nexus", { "Circle of the Nexus" })
-addDestination("Dawnshroud", { "Circle of Dawnshroud" })
-addDestination("Twilight", { "Circle of Twilight" })
-addDestination("Grimling", { "Circle of Grimling" })
+Destinations:add("Nexus", { "Circle of the Nexus" })
+Destinations:add("Dawnshroud", { "Circle of Dawnshroud" })
+Destinations:add("Twilight", { "Circle of Twilight" })
+Destinations:add("Grimling", { "Circle of Grimling" })
 
 -- Planes of Power
-addDestination("Plane of Knowledge", { "Circle of Knowledge" }, { "knowledge", "pok" })
+Destinations:add("Plane of Knowledge", { "Circle of Knowledge" }, { "knowledge", "pok" })
 
 -- Taelosia (GoD)
-addDestination("Barindu", { "Circle of Barindu" })
-addDestination("Natimbi", { "Circle of Natimbi" })
+Destinations:add("Barindu", { "Circle of Barindu" })
+Destinations:add("Natimbi", { "Circle of Natimbi" })
 
 -- Evac
-addDestination("Evac", { "Exodus", "Succor", "Lesser Succor" })
+Destinations:add("Evac", { "Exodus", "Succor", "Lesser Succor" })
 
 return Destinations

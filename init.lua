@@ -21,7 +21,7 @@ local function printHelp()
   mq.cmd("/g Port destinations")
   mq.cmd("/g - - -")
 
-  for _, destination in ipairs(Destinations) do
+  Destinations:each(function(destination)
     if destination:hasSpell() then
       if destination.aliases then
         local aliases = table.concat(destination.aliases, ", ")
@@ -30,7 +30,7 @@ local function printHelp()
         mq.cmdf("/g %s", destination.zoneName)
       end
     end
-  end
+  end)
 end
 
 local function start()
@@ -55,15 +55,14 @@ local function start()
   local function onMatch(destination)
     stopTeleport()
 
-    currentTeleport = Teleport.new(destination, settings.blockTeleport)
     Report("Destination set to %s", destination.zoneName)
 
     if destination:hasSpell() then
+      currentTeleport = Teleport.new(destination, settings.blockTeleport)
       Report("Say 'cancel' in group tell to cancel portal")
       Report("- - -")
 
       currentTeleport:cast()
-      currentTeleport = nil
     else
       for _, spell in ipairs(destination.spells) do
         Report("Missing Spell: %s", spell.name)
@@ -73,9 +72,9 @@ local function start()
     end
   end
 
-  for _, destination in ipairs(Destinations) do
+  Destinations:each(function(destination)
     destination:register(onMatch)
-  end
+  end)
 
   mq.event("stop", "#1# tells the group, 'stop'", stopTeleport)
   mq.event("cancel", "#1# tells the group, 'cancel'", stopTeleport)
