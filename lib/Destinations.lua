@@ -3,21 +3,21 @@ local Logger = require("PortBot.lib.Logger")
 local Spell = require("PortBot.lib.Spell")
 
 ---@class Destination
----@field name string
+---@field zoneName string
 ---@field spells Spell[]
 ---@field aliases string[] | nil
 local Destination = {}
 Destination.__index = Destination
 
----@param name string
+---@param zoneName string
 ---@param spells Spell[]
 ---@param aliases string[] | nil
 ---@return Destination
-function Destination.new(name, spells, aliases)
+function Destination.new(zoneName, spells, aliases)
   local destination = {}
   setmetatable(destination, Destination)
 
-  destination.name = name
+  destination.zoneName = zoneName
   destination.spells = spells
   destination.aliases = aliases
 
@@ -43,14 +43,14 @@ function Destination:register(callback)
   local eventTemplate = "destination-%s"
   local matchTemplate = "#1# tells the group, '%s'"
 
-  Logger.Debug("Registering destination(%s)", self.name)
+  Logger.Debug("Registering destination(%s)", self.zoneName)
 
   local onEvent = function()
-    Logger.Info("Handling destination %s", self.name)
+    Logger.Info("Handling destination %s", self.zoneName)
     callback(self)
   end
 
-  mq.event(eventTemplate:format(self.name), matchTemplate:format(self.name), onEvent)
+  mq.event(eventTemplate:format(self.zoneName), matchTemplate:format(self.zoneName), onEvent)
 
   local aliases = self.aliases or {}
   for _, alias in ipairs(aliases) do
@@ -61,10 +61,10 @@ end
 ----@type Destination[]
 local Destinations = {}
 
----@param name string
+---@param zoneName string
 ---@param spellNames string[]
 ---@param aliases string[] | nil
-local function addDestination(name, spellNames, aliases)
+local function addDestination(zoneName, spellNames, aliases)
   local spells = {}
 
   for _, spellName in ipairs(spellNames) do
@@ -72,7 +72,7 @@ local function addDestination(name, spellNames, aliases)
     table.insert(spells, spell)
   end
 
-  local destination = Destination.new(name, spells, aliases)
+  local destination = Destination.new(zoneName, spells, aliases)
 
   table.insert(Destinations, destination)
 

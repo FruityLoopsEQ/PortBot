@@ -58,7 +58,7 @@ function Teleport:cast()
   local spell = self.destination:getSpell()
 
   if not spell then
-    Report("Unknown teleport spell to %s", self.destination.name)
+    Report("Unknown teleport spell to %s", self.destination.zoneName)
     return
   end
 
@@ -102,7 +102,7 @@ end
 function Teleport:stop()
   self.cancel = true
 
-  Report("Canceling port to %s", self.destination.name)
+  Report("Canceling port to %s", self.destination.zoneName)
 
   if Teleport.isCasting() then
     mq.cmd("/interrupt")

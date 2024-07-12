@@ -25,9 +25,9 @@ local function printHelp()
     if destination:hasSpell() then
       if destination.aliases then
         local aliases = table.concat(destination.aliases, ", ")
-        mq.cmdf("/g %s (%s)", destination.name, aliases)
+        mq.cmdf("/g %s (%s)", destination.zoneName, aliases)
       else
-        mq.cmdf("/g %s", destination.name)
+        mq.cmdf("/g %s", destination.zoneName)
       end
     end
   end
@@ -56,7 +56,7 @@ local function start()
     stopTeleport()
 
     currentTeleport = Teleport.new(destination, settings.blockTeleport)
-    Report("Destination set to %s", destination.name)
+    Report("Destination set to %s", destination.zoneName)
 
     if destination:hasSpell() then
       Report("Say 'cancel' in group tell to cancel portal")
