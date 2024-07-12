@@ -87,6 +87,7 @@ addDestination("South Ro", { "Circle of Ro" }, { "sro", "ro" })
 addDestination("West Commonlands", { "Circle of Commons" }, { "commons", "wc" })
 addDestination("Surefall Glade", { "Circle of Surefall Glade" }, { "surefall", "sfg" })
 addDestination("North Karana", { "Circle of Karana" }, { "karana", "nk" })
+addDestination("East Karana", { "Succor: East" }, { "east karana", "ek" })
 
 -- Faydwer
 addDestination("Steamfont", { "Circle of Steamfont" })
